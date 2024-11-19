@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pymysql
 import config as CONFIG
+from gen.gen_text import gen_gemini
 
 app = Flask(__name__)
 CORS(app)
@@ -85,11 +86,69 @@ def new_story():
     topic = request.args.get('topic')
     character = request.args.get('character')
     background = request.args.get('background')
+    username = request.args.get('user')
 
     # 받은 데이터 print
-    print(f"주제:\n{topic}\n\n 캐릭터:\n{character}\n\n배경:{background}")
+    print(f"주제:\n{topic}\n\n캐릭터:\n{character}\n\n배경:\n{background}\n\n")
     
-    return jsonify({'result':'success', 'msg': '키 값이 틀립니다!'})
+    num = 1
+    context = ""
+    page1 = gen_gemini(num, topic, character, background, context)
+    #print(page1)
+    
+    try:
+        connection = pymysql.connect(
+            host=CONFIG.DB['host'],
+            user=CONFIG.DB['usr'],
+            password=CONFIG.DB['pwd'],
+            database=CONFIG.DB['db']
+        )
+        print("MySQL에 성공적으로 연결되었습니다.")
+
+        cursor = connection.cursor()
+
+        # user 테이블에서 username으로 user_id 조회
+        cursor.execute("SELECT id FROM user WHERE username = %s", (username,))
+        user_result = cursor.fetchone()
+
+        if user_result is None:
+            return jsonify({'result': 'error', 'msg': f"사용자 '{username}'이(가) 존재하지 않습니다. 먼저 사용자 등록을 진행하세요."})
+
+        user_id = user_result[0]
+
+        # story 테이블에 새로운 데이터 삽입
+        cursor.execute(
+            "INSERT INTO story (user_id, topic, `character`, background) VALUES (%s, %s, %s, %s)",
+            (user_id, topic, character, background)
+        )
+        connection.commit()
+        print("새로운 이야기가 성공적으로 저장되었습니다.")
+        
+        # 방금 삽입된 story의 id 가져오기
+        cursor.execute("SELECT LAST_INSERT_ID()")
+        story_id = cursor.fetchone()[0]
+        print(f"새로운 이야기 ID: {story_id}")
+
+        # page 테이블에 첫 번째 페이지 내용 삽입
+        cursor.execute(
+            "INSERT INTO page (user_id, story_id, pagenum, context) VALUES (%s, %s, %s, %s)",
+            (user_id, story_id, 1, page1)
+        )
+        connection.commit()
+
+        print("첫 번째 페이지가 성공적으로 저장되었습니다.")
+
+        return jsonify({'result': 'success', 'msg': '새로운 이야기가 저장되었습니다.'})
+    
+    except Exception as e:
+        print(f"에러 발생: {e}")
+        return jsonify({'result': 'error', 'msg': '데이터베이스 오류 발생!'})
+    
+    finally:
+        if 'connection' in locals() and connection.open:
+                cursor.close()
+                connection.close()
+                print("MySQL 연결이 종료되었습니다.")
     
 if __name__ == '__main__':
     ssl_key = (CONFIG.URL['ssl_fullchain'], CONFIG.URL['ssl_privkey'])
