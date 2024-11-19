@@ -5,7 +5,7 @@ import config as CONFIG
 create_user_table = """
 CREATE TABLE IF NOT EXISTS user (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    username TEXT NOT NULL
+    username VARCHAR(100) NOT NULL
 );
 """
 
@@ -13,11 +13,11 @@ create_story_table = """
 CREATE TABLE IF NOT EXISTS story (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    title TEXT,
-    topic TEXT NOT NULL,
-    `character` TEXT NOT NULL,
-    background TEXT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES user(id)
+    title VARCHAR(255),
+    topic VARCHAR(255) NOT NULL,
+    `character` VARCHAR(255) NOT NULL,
+    background VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 """
 
@@ -28,9 +28,9 @@ CREATE TABLE IF NOT EXISTS page (
     story_id INT NOT NULL,
     pagenum INT NOT NULL,
     context TEXT NOT NULL,
-    image TEXT,
-    FOREIGN KEY (user_id) REFERENCES user(id),
-    FOREIGN KEY (story_id) REFERENCES story(id),
+    image VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+    FOREIGN KEY (story_id) REFERENCES story(id) ON DELETE CASCADE,
     UNIQUE (story_id, pagenum)
 );
 """
