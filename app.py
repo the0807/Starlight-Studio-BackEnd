@@ -6,6 +6,7 @@ import config as CONFIG
 app = Flask(__name__)
 CORS(app)
 
+# login
 @app.route("/user", methods=['GET'])
 def user_check():
     user = request.args.get('user')
@@ -39,7 +40,7 @@ def user_check():
                 return jsonify({'result':'success', 'msg': f"새 사용자 '{user}'이(가) 추가되었습니다."})
             # 있다면 동화책 정보 return
             else:
-                print(f"사용자 '{user}'이(가) 이미 존재합니다.")
+                print(f"사용자 '{user}'이(가) 로그인했습니다.")
                 
                 user_id = result[0]
                 
@@ -77,6 +78,18 @@ def user_check():
 
     else:
         return jsonify({'result':'error', 'msg': '키 값이 틀립니다!'})
+    
+# newstory
+@app.route("/newstory", methods=['GET'])
+def new_story():
+    topic = request.args.get('topic')
+    character = request.args.get('character')
+    background = request.args.get('background')
+
+    # 받은 데이터 print
+    print(f"주제:\n{topic}\n\n 캐릭터:\n{character}\n\n배경:{background}")
+    
+    return jsonify({'result':'success', 'msg': '키 값이 틀립니다!'})
     
 if __name__ == '__main__':
     ssl_key = (CONFIG.URL['ssl_fullchain'], CONFIG.URL['ssl_privkey'])
