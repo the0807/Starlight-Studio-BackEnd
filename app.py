@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pymysql
 import config as CONFIG
-from gen.gen_text import gen_gemini
+from gen.gen_text import gen_gemini, gen_gemini_renew
 
 app = Flask(__name__)
 CORS(app)
@@ -59,7 +59,7 @@ def execute_query(query, params, fetch_last_id=False):
         if 'connection' in locals() and connection.open:
             connection.close()
 
-# login
+### login ###
 @app.route("/user", methods=['POST'])
 def user_check():
     user = request.args.get('user')
@@ -113,7 +113,7 @@ def user_check():
             msg = '저장된 동화를 불러왔습니다!' if stories_list else '저장된 동화가 없습니다!'
             return jsonify({'result': 'success', 'msg': msg, 'data': stories_list})
 
-# getstory
+### getstory ###
 @app.route("/getstory", methods=['POST'])
 def get_story():
     title = request.args.get('title')
@@ -159,7 +159,7 @@ def get_story():
         msg = '저장된 동화를 불러왔습니다!' if pages_list else '저장된 동화가 없습니다!'
         return jsonify({'result': 'success', 'msg': msg, 'data': pages_list})
 
-# new story
+### new story ###
 @app.route("/newstory", methods=['POST'])
 def new_story():
     title = request.args.get('title')
@@ -170,9 +170,7 @@ def new_story():
 
     num = 1
     context = ''
-    renew = False
-    before = ''
-    page1 = gen_gemini(num, topic, character, background, context, renew, before)
+    page1 = gen_gemini(num, topic, character, background, context)
 
     if page1.startswith('[시스템]'):
         return jsonify({'result': 'error', 'msg': '동화와 관련된 이야기를 작성해주세요!', 'data': ''})
@@ -204,11 +202,20 @@ def new_story():
     
     if string is not None and "ERROR" in str(string):
         return jsonify({'result': 'error', 'msg': string, 'data': ''})
+    
+    page_dict = {
+        'id': story_id,
+        'user_id': user_id,
+        'story_id': story_id,
+        'pagenum': 1,
+        'context': page1,
+        'image': '',
+    }
 
     print("새로운 이야기가 성공적으로 저장되었습니다.")
-    return jsonify({'result': 'success', 'msg': '새로운 이야기가 성공적으로 저장되었습니다!', 'data': page1})
+    return jsonify({'result': 'success', 'msg': '새로운 이야기가 성공적으로 저장되었습니다!', 'data': page_dict})
 
-# next story
+### next story ###
 @app.route("/nextstory", methods=['POST'])
 def next_story():
     story_id = request.args.get('story_id')
@@ -239,12 +246,26 @@ def next_story():
     character = story[2]
     background = story[3]
     
-    renew = False
-    before = ''
-    gen_context = gen_gemini(nextpage, topic, character, background, context, renew, before)
+    gen_context = gen_gemini(nextpage, topic, character, background, context)
 
     if gen_context.startswith('[시스템]'):
         return jsonify({'result': 'error', 'msg': '동화와 관련된 이야기를 작성해주세요!', 'data': ''})
+    
+    curr_page = int(nextpage) - 1
+    
+    # page 테이블에서 user_id로 SELECT
+    pre_context_result = fetch_one(
+        "SELECT context FROM page WHERE story_id = %s AND user_id = %s AND pagenum = %s", 
+        (story_id, user_id, str(curr_page))
+    )
+
+    if pre_context_result is not None and "ERROR" in str(pre_context_result):
+        return jsonify({'result': 'error', 'msg': pre_context_result, 'data': ''})
+    
+    pre_context = pre_context_result[0]
+    
+    if gen_context == pre_context:
+        gen_context = '동화 끝~!'
     
     # page 테이블에 context와 정보들 INSERT
     string = execute_query(
@@ -255,10 +276,19 @@ def next_story():
     if string is not None and "ERROR" in str(string):
         return jsonify({'result': 'error', 'msg': string, 'data': ''})
 
-    print("새로운 이야기가 성공적으로 저장되었습니다.")
-    return jsonify({'result': 'success', 'msg': '새로운 이야기가 성공적으로 저장되었습니다!', 'data': gen_context})
+    page_dict = {
+        'id': story_id,
+        'user_id': user_id,
+        'story_id': story_id,
+        'pagenum': nextpage,
+        'context': gen_context,
+        'image': '',
+    }
 
-# regenerate story
+    print("새로운 이야기가 성공적으로 저장되었습니다.")
+    return jsonify({'result': 'success', 'msg': '새로운 이야기가 성공적으로 저장되었습니다!', 'data': page_dict})
+
+### regenerate story ###
 @app.route("/regenstory", methods=['POST'])
 def regen_story():
     story_id = request.args.get('story_id')
@@ -291,7 +321,7 @@ def regen_story():
     background = story[3]
     
     renew = True
-    gen_context = gen_gemini(page, topic, character, background, context, renew, r_context)
+    gen_context = gen_gemini_renew(page, topic, character, background, context, r_context)
 
     if gen_context.startswith('[시스템]'):
         return jsonify({'result': 'error', 'msg': '동화와 관련된 이야기를 작성해주세요!', 'data': ''})
@@ -305,10 +335,77 @@ def regen_story():
     if string is not None and "ERROR" in str(string):
         return jsonify({'result': 'error', 'msg': string, 'data': ''})
 
-    print("재생성된 이야기가 성공적으로 저장되었습니다.")
-    return jsonify({'result': 'success', 'msg': '재생성된 이야기가 성공적으로 저장되었습니다!', 'data': gen_context})
+    page_dict = {
+        'id': story_id,
+        'user_id': user_id,
+        'story_id': story_id,
+        'pagenum': page,
+        'context': gen_context,
+        'image': '',
+    }
 
-# delete story
+    print("재생성된 이야기가 성공적으로 저장되었습니다.")
+    return jsonify({'result': 'success', 'msg': '재생성된 이야기가 성공적으로 저장되었습니다!', 'data': page_dict})
+
+### request story ###
+@app.route("/reqstory", methods=['POST'])
+def req_story():
+    story_id = request.args.get('story_id')
+    username = request.args.get('user')
+    page = request.args.get('page')
+    context = request.args.get('context')
+    request = request.args.get('request')
+    
+    # username으로 user 테이블에서 user_id SELECT
+    user_result = fetch_one("SELECT id FROM user WHERE username = %s", (username,))
+    if not user_result:
+        return jsonify({'result': 'error', 'msg': '사용자가 존재하지 않습니다.', 'data': ''})
+    elif user_result is not None and "ERROR" in str(user_result):
+            return jsonify({'result': 'error', 'msg': user_result, 'data': ''})
+    
+    user_id = user_result[0]
+    
+    # story 테이블에서 user_id로 SELECT
+    story = fetch_one(
+        "SELECT title, topic, `character`, background FROM story WHERE id = %s AND user_id = %s", 
+        (story_id, user_id,)
+    )
+
+    if story is not None and "ERROR" in str(story):
+        return jsonify({'result': 'error', 'msg': story, 'data': ''})
+    
+    title = story[0]
+    topic = story[1]
+    character = story[2]
+    background = story[3]
+    
+    gen_context = gen_gemini_update(page, topic, character, background, context, request)
+
+    if gen_context.startswith('[시스템]'):
+        return jsonify({'result': 'error', 'msg': '동화와 관련된 이야기를 작성해주세요!', 'data': ''})
+    
+    # page 테이블에서 user_id, story_id, pagenum에 해당하는 context UPDATE
+    string = execute_query(
+        "UPDATE page SET context = %s WHERE user_id = %s AND story_id = %s AND pagenum = %s",
+        (gen_context, user_id, story_id, page)
+    )
+    
+    if string is not None and "ERROR" in str(string):
+        return jsonify({'result': 'error', 'msg': string, 'data': ''})
+
+    page_dict = {
+        'id': story_id,
+        'user_id': user_id,
+        'story_id': story_id,
+        'pagenum': page,
+        'context': gen_context,
+        'image': '',
+    }
+
+    print("요청사항이 반영된 이야기가 성공적으로 저장되었습니다.")
+    return jsonify({'result': 'success', 'msg': '요청사항이 반영된 이야기가 성공적으로 저장되었습니다!', 'data': page_dict})
+
+### delete story ###
 @app.route("/delstory", methods=['POST'])
 def del_story():
     story_id = request.args.get('story_id')
@@ -332,9 +429,9 @@ def del_story():
     if delstory is not None and "ERROR" in str(delstory):
         return jsonify({'result': 'error', 'msg': delstory, 'data': ''})
     else:
-        return jsonify({'result': 'success', 'msg': '동화를 성공적으로 지웠습니다!', 'data': ''})
+        return jsonify({'result': 'success', 'msg': '동화를 삭제했습니다!', 'data': ''})
     
-# change title
+### change title ###
 @app.route("/chtitle", methods=['POST'])
 def ch_title():
     story_id = request.args.get('story_id')
@@ -360,7 +457,6 @@ def ch_title():
         return jsonify({'result': 'error', 'msg': string, 'data': ''})
     else:
         return jsonify({'result': 'success', 'msg': '동화의 제목을 변경했습니다!', 'data': ''})
-    
 
 if __name__ == '__main__':
     ssl_key = (CONFIG.URL['ssl_fullchain'], CONFIG.URL['ssl_privkey'])
