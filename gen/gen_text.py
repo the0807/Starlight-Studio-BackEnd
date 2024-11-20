@@ -35,6 +35,7 @@ def gen_gemini(num, topic, character, background, context):
 4. 이전 내용이 있을 경우 이전 내용의 뒷 이야기를 생성할 것
 5. 한 문장은 "안녕하세요."와 같으며,  동화는 한 문장만 생성할 것
 6. 새로 생성하는 문장은 수정 문장과 다른 문장이어야 하며, 이전 내용이 포함되지 않을 것
+7. "연필이 부러졌어요. '다른 내용 만들어줘요' 버튼을 눌러 새로운 연필을 주세요!"라는 내용이 있으면, 계속 동화를 생성할 것
 페이지 번호에 해당하는 내용을 만드는 건데, 주제, 캐릭터, 배경, 이전 내용을 참고해서 동화의 다음 내용을 한 줄 생성해줘.
     """
     
@@ -46,7 +47,7 @@ def gen_gemini(num, topic, character, background, context):
     safety_settings = [
         SafetySetting(
             category=HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold=HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+            threshold=HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
         ),
         SafetySetting(
             category=HarmCategory.HARM_CATEGORY_HATE_SPEECH,
@@ -58,7 +59,7 @@ def gen_gemini(num, topic, character, background, context):
         ),
         SafetySetting(
             category=HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold=HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+            threshold=HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
         ),
     ]
 
@@ -96,6 +97,7 @@ def gen_gemini_renew(num, topic, character, background, context, before):
 2. 동화 제작과 관련이 없는 질문을 할 때에는 "[시스템] 저는 동화 창작 도우미입니다. 동화와 관련된 이야기를 작성해주세요!"를 출력할 것
 3. 이전 내용을 참고해서 동화의 뒷 이야기를 만들 것
 4. 한 문장은 "안녕하세요."와 같으며,  동화는 한 문장만 생성할 것
+5. "연필이 부러졌어요. '다른 내용 만들어줘요' 버튼을 눌러 새로운 연필을 주세요!"라는 내용이 있으면, 계속 동화를 생성할 것
 페이지 번호에 해당하는 내용을 만드는 건데, 수정 문장을 내가 만든 페이지 내용이야. 너는 주제, 캐릭터, 배경, 이전 내용을 참고해서 수정 문장과 다른 내용으로 동화 내용을 생성해줘.
     """
     
@@ -107,7 +109,7 @@ def gen_gemini_renew(num, topic, character, background, context, before):
     safety_settings = [
         SafetySetting(
             category=HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold=HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+            threshold=HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
         ),
         SafetySetting(
             category=HarmCategory.HARM_CATEGORY_HATE_SPEECH,
@@ -119,7 +121,7 @@ def gen_gemini_renew(num, topic, character, background, context, before):
         ),
         SafetySetting(
             category=HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold=HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+            threshold=HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
         ),
     ]
 
@@ -157,6 +159,7 @@ def gen_gemini_update(num, topic, character, background, context, request_text):
 2. 동화 제작과 관련이 없는 질문을 할 때에는 "[시스템] 저는 동화 창작 도우미입니다. 동화와 관련된 이야기를 작성해주세요!"를 출력할 것
 3. 이전 내용을 참고해서 동화의 뒷 이야기를 만들 것
 4. 한 문장은 "안녕하세요."와 같으며,  동화는 한 문장만 생성할 것
+5. "연필이 부러졌어요. '다른 내용 만들어줘요' 버튼을 눌러 새로운 연필을 주세요!"라는 내용이 있으면, 계속 동화를 생성할 것
 페이지 번호에 해당하는 내용을 만드는 건데, 수정 문장을 내가 만든 페이지 내용인데, 문장을 수정하고 싶어.
 너는 주제, 캐릭터, 배경, 이전 내용을 참고해서 다음 동화 내용을 만들면 되는데, 참고내용을 적용해서 만들어줘.
     """
@@ -169,7 +172,7 @@ def gen_gemini_update(num, topic, character, background, context, request_text):
     safety_settings = [
         SafetySetting(
             category=HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold=HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+            threshold=HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
         ),
         SafetySetting(
             category=HarmCategory.HARM_CATEGORY_HATE_SPEECH,
@@ -181,7 +184,7 @@ def gen_gemini_update(num, topic, character, background, context, request_text):
         ),
         SafetySetting(
             category=HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold=HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+            threshold=HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
         ),
     ]
 

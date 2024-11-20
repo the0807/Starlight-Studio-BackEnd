@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pymysql
 import config as CONFIG
-from gen.gen_text import gen_gemini, gen_gemini_renew
+from gen.gen_text import gen_gemini, gen_gemini_renew, gen_gemini_update
 
 app = Flask(__name__)
 CORS(app)
@@ -196,7 +196,11 @@ def new_story():
     
     # page 테이블에 INSERT
     string = execute_query(
-        "INSERT INTO page (user_id, story_id, pagenum, context) VALUES (%s, %s, %s, %s)",
+        """
+        INSERT INTO page (user_id, story_id, pagenum, context)
+        VALUES (%s, %s, %s, %s)
+        ON DUPLICATE KEY UPDATE context = VALUES(context)
+        """,
         (user_id, story_id, 1, page1)
     )
     
@@ -269,7 +273,11 @@ def next_story():
     
     # page 테이블에 context와 정보들 INSERT
     string = execute_query(
-        "INSERT INTO page (user_id, story_id, pagenum, context) VALUES (%s, %s, %s, %s)",
+        """
+        INSERT INTO page (user_id, story_id, pagenum, context)
+        VALUES (%s, %s, %s, %s)
+        ON DUPLICATE KEY UPDATE context = VALUES(context)
+        """,
         (user_id, story_id, nextpage, gen_context)
     )
     
@@ -320,7 +328,6 @@ def regen_story():
     character = story[2]
     background = story[3]
     
-    renew = True
     gen_context = gen_gemini_renew(page, topic, character, background, context, r_context)
 
     if gen_context.startswith('[시스템]'):
@@ -354,7 +361,7 @@ def req_story():
     username = request.args.get('user')
     page = request.args.get('page')
     context = request.args.get('context')
-    request = request.args.get('request')
+    req_context = request.args.get('request')
     
     # username으로 user 테이블에서 user_id SELECT
     user_result = fetch_one("SELECT id FROM user WHERE username = %s", (username,))
@@ -379,7 +386,7 @@ def req_story():
     character = story[2]
     background = story[3]
     
-    gen_context = gen_gemini_update(page, topic, character, background, context, request)
+    gen_context = gen_gemini_update(page, topic, character, background, context, req_context)
 
     if gen_context.startswith('[시스템]'):
         return jsonify({'result': 'error', 'msg': '동화와 관련된 이야기를 작성해주세요!', 'data': ''})
@@ -449,7 +456,7 @@ def ch_title():
     
     # story 테이블에서 user_id, story_id에 해당하는 title UPDATE
     string = execute_query(
-        "UPDATE story SET title = %s WHERE user_id = %s AND story_id = %s",
+        "UPDATE story SET title = %s WHERE user_id = %s AND id = %s",
         (newtitle, user_id, story_id)
     )
     

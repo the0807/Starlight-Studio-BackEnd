@@ -1,5 +1,6 @@
 import re
 import base64
+from vertexai.preview.generative_models import GenerativeModel, Part, HarmCategory, HarmBlockThreshold, SafetySetting
 from vertexai.preview.vision_models import ImageGenerationModel
 from vertexai import init
 import os
@@ -18,27 +19,43 @@ LOCATION = "us-east1"
 init(project=PROJECT_ID, location=LOCATION)
 
 #모델 설정
-generation_model_fast = ImageGenerationModel.from_pretrained("imagen-3.0-fast-generate-001")
+text_model = GenerativeModel("gemini-1.5-flash")
+img_model = ImageGenerationModel.from_pretrained("imagen-3.0-fast-generate-001")
 
 #이미지 생성 함수
-def gen_gemini(trans_result):
+#이미지는 Pillow 라이브러리 객체 타입
+def gen_img(input):
+    #영어 번역 생성 시스템 프롬프트
+    prompt = f"다음 문장을 영어로 번역해줘 무조건 한 문장만 출력해줘\n{input}"
+    
+    #영어 번역 생성
+    response = text_model.generate_content(
+        [prompt],
+        generation_config={"max_output_tokens": 200, "temperature": 0.7, "top_p": 0.2, "top_k": 1},
+        stream=False  
+    )
+
+    #이미지 생성 시스템 프롬프트
+    trans_result = "Draw the following sentence in fairy tale-style pastel colors\n"
+    trans_result += response.candidates[0].content.parts[0].text
+    
     #이미지 생성
-    fast_image = generation_model_fast.generate_images(
-    prompt = trans_result,
-    number_of_images=1,
-    aspect_ratio="1:1",
-    safety_filter_level="block_low_and_above",
-    person_generation="dont_allow",
+    result = img_model.generate_images(
+        prompt=trans_result,
+        number_of_images=1,
+        aspect_ratio="1:1",
+        safety_filter_level="block_low_and_above",
+        person_generation="dont_allow",
     )
     
-    result_img = fast_image[0]._pil_image
-    
-    #이미지 저장 코드
-    #result_img.save(f'./image/img0.jpg', 'png')
+    #이미지 반환
+    return result[0]._pil_image
 
-    # 이미지 보여주기
-    # plt.imshow(fast_image[0]._pil_image)
-    # plt.axis("off")
-    # plt.show()
+    #이미지 불러오기 코드
+    #from PIL import Image
+    #im = Image.open('./test.jpg')
+    #plt.imshow(im)
 
-    return result_img
+    #이미지 저장 코드 
+    #save("저장 주소", "png")
+    #ex) result.save("./test.jpg", "png")
