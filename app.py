@@ -77,13 +77,13 @@ def user_check():
             # user INSERT
             string = execute_query("INSERT INTO user (username) VALUES (%s)", (user,))
             
-            if "ERROR" in string:
+            if string is not None and "ERROR" in str(string):
                 return jsonify({'result': 'error', 'msg': string, 'data': ''})
         
             print(f"사용자 '{user}'이(가) 추가되었습니다.")
 
             return jsonify({'result': 'success', 'msg': f"새 사용자 '{user}'이(가) 추가되었습니다.", 'data': ''})
-        elif "ERROR" in user_result:
+        elif user_result is not None and "ERROR" in str(user_result):
             return jsonify({'result': 'error', 'msg': user_result, 'data': ''})
         else:
             print(f"사용자 '{user}'이(가) 로그인했습니다.")
@@ -95,7 +95,7 @@ def user_check():
                 (user_id,)
             )
             
-            if "ERROR" in stories:
+            if stories is not None and "ERROR" in str(stories):
                 return jsonify({'result': 'error', 'msg': stories, 'data': ''})
 
             # story 데이터를 JSON으로 반환
@@ -123,7 +123,7 @@ def get_story():
     user_result = fetch_one("SELECT id FROM user WHERE username = %s", (username,))
     if not user_result:
         return jsonify({'result': 'error', 'msg': '사용자가 존재하지 않습니다.', 'data': ''})
-    elif "ERROR" in user_result:
+    elif user_result is not None and "ERROR" in str(user_result):
             return jsonify({'result': 'error', 'msg': user_result, 'data': ''})
     
     user_id = user_result[0]
@@ -132,7 +132,7 @@ def get_story():
     story_result = fetch_one("SELECT id FROM story WHERE user_id = %s AND title = %s", (user_id, title,))
     if not story_result:
         return jsonify({'result': 'error', 'msg': '동화가 존재하지 않습니다.', 'data': ''})
-    elif "ERROR" in story_result:
+    elif story_result is not None and "ERROR" in str(story_result):
         return jsonify({'result': 'error', 'msg': story_result, 'data': ''})
     else:
         story_id = story_result[0]
@@ -140,7 +140,7 @@ def get_story():
         # user_id와 story_id로 page 테이블에서 * SELECT
         page_result = fetch_all("SELECT * FROM page WHERE user_id = %s AND story_id = %s", (user_id, story_id,))
         
-        if "ERROR" in page_result:
+        if page_result is not None and "ERROR" in str(page_result):
             return jsonify({'result': 'error', 'msg': page_result, 'data': ''})
         
         # page 데이터를 JSON으로
@@ -181,7 +181,7 @@ def new_story():
     user_result = fetch_one("SELECT id FROM user WHERE username = %s", (username,))
     if not user_result:
         return jsonify({'result': 'error', 'msg': '사용자가 존재하지 않습니다.', 'data': ''})
-    elif "ERROR" in user_result:
+    elif user_result is not None and "ERROR" in str(user_result):
             return jsonify({'result': 'error', 'msg': user_result, 'data': ''})
     
     user_id = user_result[0]
@@ -193,7 +193,7 @@ def new_story():
         fetch_last_id=True
     )
     
-    if "ERROR" in story_id:
+    if story_id is not None and "ERROR" in str(story_id):
         return jsonify({'result': 'error', 'msg': story_id, 'data': ''})
     
     # page 테이블에 INSERT
@@ -202,7 +202,7 @@ def new_story():
         (user_id, story_id, 1, page1)
     )
     
-    if "ERROR" in string:
+    if string is not None and "ERROR" in str(string):
         return jsonify({'result': 'error', 'msg': string, 'data': ''})
 
     print("새로운 이야기가 성공적으로 저장되었습니다.")
@@ -214,30 +214,30 @@ def next_story():
     story_id = request.args.get('story_id')
     username = request.args.get('user')
     nextpage = request.args.get('page')
-    title = request.args.get('title')
     context = request.args.get('context')
     
     # username으로 user 테이블에서 user_id SELECT
     user_result = fetch_one("SELECT id FROM user WHERE username = %s", (username,))
     if not user_result:
         return jsonify({'result': 'error', 'msg': '사용자가 존재하지 않습니다.', 'data': ''})
-    elif "ERROR" in user_result:
+    elif user_result is not None and "ERROR" in str(user_result):
             return jsonify({'result': 'error', 'msg': user_result, 'data': ''})
     
     user_id = user_result[0]
     
     # story 테이블에서 user_id로 SELECT
     story = fetch_one(
-        "SELECT topic, `character`, background FROM story WHERE id = %s AND user_id = %s", 
+        "SELECT title, topic, `character`, background FROM story WHERE id = %s AND user_id = %s", 
         (story_id, user_id,)
     )
 
-    if "ERROR" in story:
+    if story is not None and "ERROR" in str(story):
         return jsonify({'result': 'error', 'msg': story, 'data': ''})
     
-    topic = story[0]
-    character = story[1]
-    background = story[2]
+    title = story[0]
+    topic = story[1]
+    character = story[2]
+    background = story[3]
     
     renew = False
     before = ''
@@ -252,7 +252,7 @@ def next_story():
         (user_id, story_id, nextpage, gen_context)
     )
     
-    if "ERROR" in string:
+    if string is not None and "ERROR" in str(string):
         return jsonify({'result': 'error', 'msg': string, 'data': ''})
 
     print("새로운 이야기가 성공적으로 저장되었습니다.")
@@ -264,7 +264,6 @@ def regen_story():
     story_id = request.args.get('story_id')
     username = request.args.get('user')
     page = request.args.get('page')
-    title = request.args.get('title')
     context = request.args.get('context')
     r_context = request.args.get('r_context')
     
@@ -272,23 +271,24 @@ def regen_story():
     user_result = fetch_one("SELECT id FROM user WHERE username = %s", (username,))
     if not user_result:
         return jsonify({'result': 'error', 'msg': '사용자가 존재하지 않습니다.', 'data': ''})
-    elif "ERROR" in user_result:
+    elif user_result is not None and "ERROR" in str(user_result):
             return jsonify({'result': 'error', 'msg': user_result, 'data': ''})
     
     user_id = user_result[0]
     
     # story 테이블에서 user_id로 SELECT
     story = fetch_one(
-        "SELECT topic, `character`, background FROM story WHERE id = %s AND user_id = %s", 
+        "SELECT title, topic, `character`, background FROM story WHERE id = %s AND user_id = %s", 
         (story_id, user_id,)
     )
 
-    if "ERROR" in story:
+    if story is not None and "ERROR" in str(story):
         return jsonify({'result': 'error', 'msg': story, 'data': ''})
     
-    topic = story[0]
-    character = story[1]
-    background = story[2]
+    title = story[0]
+    topic = story[1]
+    character = story[2]
+    background = story[3]
     
     renew = True
     gen_context = gen_gemini(page, topic, character, background, context, renew, r_context)
@@ -302,7 +302,7 @@ def regen_story():
         (gen_context, user_id, story_id, page)
     )
     
-    if "ERROR" in string:
+    if string is not None and "ERROR" in str(string):
         return jsonify({'result': 'error', 'msg': string, 'data': ''})
 
     print("재생성된 이야기가 성공적으로 저장되었습니다.")
