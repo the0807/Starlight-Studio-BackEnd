@@ -8,4 +8,4 @@
 
 
 # 🧑🏻‍💻 ER Diagram
-<img width="1017" alt="EDR" src="https://github.com/user-attachments/assets/f8ae6754-5365-4b86-b453-d40735b1251c">
+<img width="894" alt="ERD" src="https://github.com/user-attachments/assets/8eddd1ff-9590-4832-84b7-1a17913b8e01">
