@@ -13,11 +13,12 @@ create_story_table = """
 CREATE TABLE IF NOT EXISTS story (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    title VARCHAR(255),
+    title VARCHAR(255) NOT NULL,
     topic VARCHAR(255) NOT NULL,
     `character` VARCHAR(255) NOT NULL,
     background VARCHAR(255) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+    UNIQUE (user_id, title)
 );
 """
 
