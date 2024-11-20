@@ -308,6 +308,60 @@ def regen_story():
     print("재생성된 이야기가 성공적으로 저장되었습니다.")
     return jsonify({'result': 'success', 'msg': '재생성된 이야기가 성공적으로 저장되었습니다!', 'data': gen_context})
 
+# delete story
+@app.route("/delstory", methods=['POST'])
+def del_story():
+    story_id = request.args.get('story_id')
+    username = request.args.get('user')
+    
+    # username으로 user 테이블에서 user_id SELECT
+    user_result = fetch_one("SELECT id FROM user WHERE username = %s", (username,))
+    if not user_result:
+        return jsonify({'result': 'error', 'msg': '사용자가 존재하지 않습니다.', 'data': ''})
+    elif user_result is not None and "ERROR" in str(user_result):
+            return jsonify({'result': 'error', 'msg': user_result, 'data': ''})
+    
+    user_id = user_result[0]
+
+    # story 테이블에서 user_id, story_id에 해당하는 행 DELETE
+    delstory = execute_query(
+        "DELETE FROM story WHERE id = %s AND user_id = %s;", 
+        (story_id, user_id,)
+    )
+    
+    if delstory is not None and "ERROR" in str(delstory):
+        return jsonify({'result': 'error', 'msg': delstory, 'data': ''})
+    else:
+        return jsonify({'result': 'success', 'msg': '동화를 성공적으로 지웠습니다!', 'data': ''})
+    
+# change title
+@app.route("/chtitle", methods=['POST'])
+def ch_title():
+    story_id = request.args.get('story_id')
+    username = request.args.get('user')
+    newtitle = request.args.get('newtitle')
+    
+    # username으로 user 테이블에서 user_id SELECT
+    user_result = fetch_one("SELECT id FROM user WHERE username = %s", (username,))
+    if not user_result:
+        return jsonify({'result': 'error', 'msg': '사용자가 존재하지 않습니다.', 'data': ''})
+    elif user_result is not None and "ERROR" in str(user_result):
+            return jsonify({'result': 'error', 'msg': user_result, 'data': ''})
+    
+    user_id = user_result[0]
+    
+    # story 테이블에서 user_id, story_id에 해당하는 title UPDATE
+    string = execute_query(
+        "UPDATE story SET title = %s WHERE user_id = %s AND story_id = %s",
+        (newtitle, user_id, story_id)
+    )
+    
+    if string is not None and "ERROR" in str(string):
+        return jsonify({'result': 'error', 'msg': string, 'data': ''})
+    else:
+        return jsonify({'result': 'success', 'msg': '동화의 제목을 변경했습니다!', 'data': ''})
+    
+
 if __name__ == '__main__':
     ssl_key = (CONFIG.URL['ssl_fullchain'], CONFIG.URL['ssl_privkey'])
     app.run('0.0.0.0', port=1222, ssl_context=ssl_key, debug=True)
