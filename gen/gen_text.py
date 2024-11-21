@@ -4,15 +4,16 @@ from vertexai.preview.generative_models import GenerativeModel, Part, HarmCatego
 from vertexai import init
 import os
 import matplotlib.pyplot as plt
+import config as CONFIG
 
 #프로젝트 서비스 계정 환경 변수 설정
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/home/ubuntu/gemini/key/hci-service-account.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = CONFIG.PROJECT['GOOGLE_APPLICATION_CREDENTIALS']
 
 #프로젝트 id
-PROJECT_ID = "hci202401" 
+PROJECT_ID = CONFIG.PROJECT['id']
 
 #프로젝트 region
-LOCATION = "us-east1" 
+LOCATION = CONFIG.PROJECT['location']
 
 #프로젝트 id, region 설정
 init(project=PROJECT_ID, location=LOCATION)
