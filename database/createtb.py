@@ -1,5 +1,8 @@
 import pymysql
-import config as CONFIG
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 create_user_table = """
@@ -38,12 +41,12 @@ CREATE TABLE IF NOT EXISTS page (
 
 try:
     connection = pymysql.connect(
-        host=CONFIG.DB['host'],
-        user=CONFIG.DB['usr'],
-        password=CONFIG.DB['pwd'],
-        database=CONFIG.DB['db']
+        host = os.getenv('DB_HOST'),
+        user = os.getenv('DB_USR'),
+        password = os.getenv('DB_PWD'),
+        database = os.getenv('DB_NAME')
     )
-    print(f"'{CONFIG.DB['db']}' 데이터베이스에 연결되었습니다.")
+    print(f"'{os.getenv('DB_NAME')}' 데이터베이스에 연결되었습니다.")
 
     cursor = connection.cursor()
 

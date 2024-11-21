@@ -1,11 +1,14 @@
 import pymysql
-import config as CONFIG
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 try:
     connection = pymysql.connect(
-        host=CONFIG.DB['host'],
-        user=CONFIG.DB['usr'],
-        password=CONFIG.DB['pwd']
+        host = os.getenv('DB_HOST'),
+        user = os.getenv('DB_USR'),
+        password = os.getenv('DB_PWD'),
     )
     print("MySQL에 성공적으로 연결되었습니다.")
 

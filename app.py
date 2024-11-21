@@ -1,8 +1,11 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pymysql
-import config as CONFIG
 from gen.gen_text import gen_gemini, gen_gemini_renew, gen_gemini_update
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -10,10 +13,10 @@ CORS(app)
 # DB setting
 def get_db_connection():
     return pymysql.connect(
-        host = CONFIG.DB['host'],
-        user = CONFIG.DB['usr'],
-        password = CONFIG.DB['pwd'],
-        database = CONFIG.DB['db']
+        host = os.getenv('DB_HOST'),
+        user = os.getenv('DB_USR'),
+        password = os.getenv('DB_PWD'),
+        database = os.getenv('DB_NAME')
     )
 
 # fetchone
@@ -65,7 +68,7 @@ def user_check():
     user = request.args.get('user')
     key = request.args.get('key')
 
-    if key != CONFIG.KEY['login_key']:
+    if key != os.getenv('LOGIN_KEY'):
         return jsonify({'result': 'error', 'msg': '키 값을 다시 확인해주세요!', 'data': ''})
     else:
         # user가 있는지 검색
@@ -466,5 +469,5 @@ def ch_title():
         return jsonify({'result': 'success', 'msg': '동화의 제목을 변경했습니다!', 'data': ''})
 
 if __name__ == '__main__':
-    ssl_key = (CONFIG.URL['ssl_fullchain'], CONFIG.URL['ssl_privkey'])
+    ssl_key = (os.getenv('SSL_FULLCHAIN'), os.getenv('SSL_PRIVKEY'))
     app.run('0.0.0.0', port=1222, ssl_context=ssl_key, debug=True)

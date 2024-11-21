@@ -4,16 +4,18 @@ from vertexai.preview.generative_models import GenerativeModel, Part, HarmCatego
 from vertexai import init
 import os
 import matplotlib.pyplot as plt
-import config as CONFIG
+from dotenv import load_dotenv
+
+load_dotenv()
 
 #프로젝트 서비스 계정 환경 변수 설정
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = CONFIG.PROJECT['GOOGLE_APPLICATION_CREDENTIALS']
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 
 #프로젝트 id
-PROJECT_ID = CONFIG.PROJECT['id']
+PROJECT_ID = os.getenv('PROJECT_ID')
 
 #프로젝트 region
-LOCATION = CONFIG.PROJECT['location']
+LOCATION = os.getenv('PROJECT_LOCATION')
 
 #프로젝트 id, region 설정
 init(project=PROJECT_ID, location=LOCATION)
