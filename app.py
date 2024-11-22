@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import pymysql
 from gen.gen_text import gen_text, gen_text_renew, gen_text_update
 import os
+import urllib
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -132,7 +133,10 @@ def get_story():
     user_id = user_result[0]
     
     # user_id와 title로 story 테이블에서 story_id SELECT
-    story_result = fetch_one("SELECT id FROM story WHERE user_id = %s AND title = %s", (user_id, title,))
+    story_result = fetch_one(
+        "SELECT id FROM story WHERE user_id = %s AND title = %s", 
+        (user_id, title,)
+    )
     if not story_result:
         return jsonify({'result': 'error', 'msg': '동화가 존재하지 않습니다.', 'data': ''})
     elif story_result is not None and "ERROR" in str(story_result):
@@ -141,7 +145,10 @@ def get_story():
         story_id = story_result[0]
         
         # user_id와 story_id로 page 테이블에서 * SELECT
-        page_result = fetch_all("SELECT * FROM page WHERE user_id = %s AND story_id = %s", (user_id, story_id,))
+        page_result = fetch_all(
+            "SELECT * FROM page WHERE user_id = %s AND story_id = %s", 
+            (user_id, story_id,)
+        )
         
         if page_result is not None and "ERROR" in str(page_result):
             return jsonify({'result': 'error', 'msg': page_result, 'data': ''})
@@ -493,6 +500,81 @@ def ch_title():
         return jsonify({'result': 'error', 'msg': string, 'data': ''})
     else:
         return jsonify({'result': 'success', 'msg': '동화의 제목을 변경했습니다!', 'data': ''})
+    
+### generate img ###
+@app.route("/genimg", methods=['POST'])
+def gen_story():
+    story_id = request.args.get('story_id')
+    username = request.args.get('user')
+    page = request.args.get('page')
+    
+    # username으로 user 테이블에서 user_id SELECT
+    user_result = fetch_one("SELECT id FROM user WHERE username = %s", (username,))
+    if not user_result:
+        return jsonify({'result': 'error', 'msg': '사용자가 존재하지 않습니다.', 'data': ''})
+    elif user_result is not None and "ERROR" in str(user_result):
+            return jsonify({'result': 'error', 'msg': user_result, 'data': ''})
+    
+    user_id = user_result[0]
+    
+    # story 테이블에서 user_id로 SELECT
+    story = fetch_one(
+        "SELECT title, topic, `character`, background FROM story WHERE id = %s AND user_id = %s", 
+        (story_id, user_id,)
+    )
+
+    if story is not None and "ERROR" in str(story):
+        return jsonify({'result': 'error', 'msg': story, 'data': ''})
+    
+    title = story[0]
+    topic = story[1]
+    character = story[2]
+    background = story[3]
+    
+    # page 테이블에서 page로 SELECT
+    context_result = fetch_one(
+        "SELECT context FROM page WHERE story_id = %s AND user_id = %s AND pagenum = %s", 
+        (story_id, user_id, page)
+    )
+
+    if context_result is not None and "ERROR" in str(context_result):
+        return jsonify({'result': 'error', 'msg': context_result, 'data': ''})
+    
+    context = context_result[0]
+    
+    gen_img_url = gen_img(topic, character, background, context)
+    
+    img_save_dir = f'img/{user_id}/{story_id}'
+    img_name = f'img_{page}.png'
+    img_save_url = os.path.join(img_save_dir, img_name)
+    
+    if not os.path.exists(img_save_dir):
+        os.makedirs(img_save_dir)
+    
+    urllib.request.urlretrieve(gen_img_url, img_save_url)
+        
+    # page 테이블에서 user_id, story_id, pagenum에 해당하는 image UPDATE
+    string = execute_query(
+        "UPDATE page SET image = %s WHERE user_id = %s AND story_id = %s AND pagenum = %s",
+        (img_save_url, user_id, story_id, page)
+    )
+    
+    if string is not None and "ERROR" in str(string):
+        return jsonify({'result': 'error', 'msg': string, 'data': ''})
+    
+    img_send_form = send_from_directory(img_save_dir, img_name)
+    
+    page_dict = {
+        'id': story_id,
+        'user_id': user_id,
+        'story_id': story_id,
+        'pagenum': page,
+        'context': context,
+        'image': img_send_form,
+    }
+
+    print("이미지가 성공적으로 생성되었습니다.")
+    return jsonify({'result': 'success', 'msg': '이미지가 성공적으로 생성되었습니다!', 'data': page_dict})
 
 if __name__ == '__main__':
     ssl_key = (os.getenv('SSL_FULLCHAIN'), os.getenv('SSL_PRIVKEY'))
