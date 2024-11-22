@@ -415,6 +415,32 @@ def req_story():
     print("요청사항이 반영된 이야기가 성공적으로 저장되었습니다.")
     return jsonify({'result': 'success', 'msg': '요청사항이 반영된 이야기가 성공적으로 저장되었습니다!', 'data': page_dict})
 
+### end story ###
+@app.route("/endstory", methods=['POST'])
+def end_story():
+    story_id = request.args.get('story_id')
+    username = request.args.get('user')
+    
+    # username으로 user 테이블에서 user_id SELECT
+    user_result = fetch_one("SELECT id FROM user WHERE username = %s", (username,))
+    if not user_result:
+        return jsonify({'result': 'error', 'msg': '사용자가 존재하지 않습니다.', 'data': ''})
+    elif user_result is not None and "ERROR" in str(user_result):
+            return jsonify({'result': 'error', 'msg': user_result, 'data': ''})
+    
+    user_id = user_result[0]
+
+    # story 테이블에서 user_id, story_id에 해당하는 end TRUE로 UPDATE
+    endstory = execute_query(
+        "UPDATE story SET `end` = TRUE WHERE user_id = %s AND id = %s",
+        (user_id, story_id)
+    )
+    
+    if endstory is not None and "ERROR" in str(endstory):
+        return jsonify({'result': 'error', 'msg': endstory, 'data': ''})
+    else:
+        return jsonify({'result': 'success', 'msg': '동화가 끝났습니다!', 'data': ''})
+
 ### delete story ###
 @app.route("/delstory", methods=['POST'])
 def del_story():
