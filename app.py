@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pymysql
-from gen.gen_text import gen_gemini, gen_gemini_renew, gen_gemini_update
+from gen.gen_text import gen_text, gen_text_renew, gen_text_update
 import os
 from dotenv import load_dotenv
 
@@ -173,7 +173,7 @@ def new_story():
 
     num = 1
     context = ''
-    page1 = gen_gemini(num, topic, character, background, context)
+    page1 = gen_text(num, topic, character, background, context)
 
     if page1.startswith('[시스템]'):
         return jsonify({'result': 'error', 'msg': '동화와 관련된 이야기를 작성해주세요!', 'data': ''})
@@ -253,7 +253,7 @@ def next_story():
     character = story[2]
     background = story[3]
     
-    gen_context = gen_gemini(nextpage, topic, character, background, context)
+    gen_context = gen_text(nextpage, topic, character, background, context)
 
     if gen_context.startswith('[시스템]'):
         return jsonify({'result': 'error', 'msg': '동화와 관련된 이야기를 작성해주세요!', 'data': ''})
@@ -331,7 +331,7 @@ def regen_story():
     character = story[2]
     background = story[3]
     
-    gen_context = gen_gemini_renew(page, topic, character, background, context, r_context)
+    gen_context = gen_text_renew(page, topic, character, background, context, r_context)
 
     if gen_context.startswith('[시스템]'):
         return jsonify({'result': 'error', 'msg': '동화와 관련된 이야기를 작성해주세요!', 'data': ''})
@@ -389,7 +389,7 @@ def req_story():
     character = story[2]
     background = story[3]
     
-    gen_context = gen_gemini_update(page, topic, character, background, context, req_context)
+    gen_context = gen_text_update(page, topic, character, background, context, req_context)
 
     if gen_context.startswith('[시스템]'):
         return jsonify({'result': 'error', 'msg': '동화와 관련된 이야기를 작성해주세요!', 'data': ''})

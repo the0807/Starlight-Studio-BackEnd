@@ -1,64 +1,40 @@
-import re
-import base64
-from vertexai.preview.generative_models import GenerativeModel, Part, HarmCategory, HarmBlockThreshold, SafetySetting
-from vertexai.preview.vision_models import ImageGenerationModel
-from vertexai import init
-import os
-import matplotlib.pyplot as plt
+import urllib
+from openai import OpenAI
 from dotenv import load_dotenv
-
 load_dotenv()
 
-#프로젝트 서비스 계정 환경 변수 설정
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+#모델 생성
+client = OpenAI()
 
-#프로젝트 id
-PROJECT_ID = os.getenv('PROJECT_ID')
+#함수 생성
+#topic - 주제 (ex. "토끼의 여행")
+#character - 캐릭터 (ex. "토끼와 거북이, 마법의 거울")
+#background - 배경 (ex. "마법의 숲에 있는 거대한 성에 살고 있는 토끼가 여행을 떠난다")
+#prompt_input - 동화 내용 (ex. "마법의 숲에 사는 토끼는 신나는 여행을 떠나기 위해 거대한 성의 문을 열고 친구 거북이와 함께 모험을 시작했어요.")
+def gen_img(topic, character, background, prompt_input):
+        
+        sys_prompt = """###시스템 프롬프트:
+아래는 그림을 그릴 때 지켜야 하는 규칙이야.
+1. 그림에는 술, 총, 폭력, 마약 등과 같이 어린이에게 부적절한 그림이 들어가지 않을 것
+2. 사용자 입력에 맞는 그림을 그릴 것
+3. 주제, 캐릭터, 배경, 사용자 입력을 참고해서 그릴 것
+4. 그림은 동화풍의 파스텔톤으로 그릴 것
+        """        
+        #input 지정
+        prompt_text = f"###시스템 프롬프트: {sys_prompt}\n\n###주제: {topic}\n\n##캐릭터: {character}\n\n##배경: {background}\n\n##사용자 입력: {prompt_input}\n\n"
+                
+        response = client.images.generate(
+            model = "dall-e-3",
+            prompt = prompt_text,
+            size = "1024x1024",
+            quality = "standard",
+            n = 1,
+        )
+        
+        image_url = response.data[0].url
+        
+        return image_url
 
-#프로젝트 region
-LOCATION = os.getenv('PROJECT_LOCATION')
-
-#프로젝트 id, region 설정
-init(project=PROJECT_ID, location=LOCATION)
-
-#모델 설정
-text_model = GenerativeModel("gemini-1.5-flash")
-img_model = ImageGenerationModel.from_pretrained("imagen-3.0-fast-generate-001")
-
-#이미지 생성 함수
-#이미지는 Pillow 라이브러리 객체 타입
-def gen_img(input):
-    #영어 번역 생성 시스템 프롬프트
-    prompt = f"다음 문장을 영어로 번역해줘 무조건 한 문장만 출력해줘\n{input}"
-    
-    #영어 번역 생성
-    response = text_model.generate_content(
-        [prompt],
-        generation_config={"max_output_tokens": 200, "temperature": 0.7, "top_p": 0.2, "top_k": 1},
-        stream=False  
-    )
-
-    #이미지 생성 시스템 프롬프트
-    trans_result = "Draw the following sentence in fairy tale-style pastel colors\n"
-    trans_result += response.candidates[0].content.parts[0].text
-    
-    #이미지 생성
-    result = img_model.generate_images(
-        prompt=trans_result,
-        number_of_images=1,
-        aspect_ratio="1:1",
-        safety_filter_level="block_low_and_above",
-        person_generation="dont_allow",
-    )
-    
-    #이미지 반환
-    return result[0]._pil_image
-
-    #이미지 불러오기 코드
-    #from PIL import Image
-    #im = Image.open('./test.jpg')
-    #plt.imshow(im)
-
-    #이미지 저장 코드 
-    #save("저장 주소", "png")
-    #ex) result.save("./test.jpg", "png")
+        #이미지 저장
+        #urllib.request.urlretrieve(test, "./test_img.jpg")
+        
