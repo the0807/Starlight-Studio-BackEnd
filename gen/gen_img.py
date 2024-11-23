@@ -19,6 +19,7 @@ def gen_img(topic, character, background, prompt_input):
 2. 사용자 입력에 맞는 그림을 그릴 것
 3. 주제, 캐릭터, 배경, 사용자 입력을 참고해서 그릴 것
 4. 그림은 동화풍의 파스텔톤으로 그릴 것
+5. 그림에는 말풍선과 글자가 없어야 할 것
         """        
         #input 지정
         prompt_text = f"###시스템 프롬프트: {sys_prompt}\n\n###주제: {topic}\n\n###캐릭터: {character}\n\n###배경: {background}\n\n###사용자 입력: {prompt_input}\n\n"
@@ -52,6 +53,7 @@ def gen_img_update(topic, character, background, prompt_input, request_text):
 2. 사용자 입력에 맞는 그림을 그릴 것
 3. 주제, 캐릭터, 배경, 사용자 입력과 참고사항을 적용해서 그릴 것
 4. 그림은 동화풍의 파스텔톤으로 그릴 것
+5. 그림에는 말풍선과 글자가 없어야 할 것
         """        
         #input 지정
         prompt_text = f"###시스템 프롬프트: {sys_prompt}\n\n###주제: {topic}\n\n###캐릭터: {character}\n\n###배경: {background}\n\n###참고사항: {request_text}\n\n##사용자 입력: {prompt_input}\n\n"
