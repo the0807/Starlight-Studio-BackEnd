@@ -1,7 +1,8 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pymysql
 from gen.gen_text import gen_text, gen_text_renew, gen_text_update
+from gen.gen_img import gen_img, gen_img_update
 import os
 import urllib
 from dotenv import load_dotenv
@@ -506,7 +507,7 @@ def ch_title():
     
 ### generate img ###
 @app.route("/genimg", methods=['POST'])
-def gen_img():
+def gen_image():
     story_id = request.args.get('story_id')
     username = request.args.get('user')
     page = request.args.get('page')
@@ -547,7 +548,7 @@ def gen_img():
     
     gen_img_url = gen_img(topic, character, background, context)
     
-    img_save_dir = f'img/{user_id}/{story_id}'
+    img_save_dir = f'/home/ubuntu/public_html/img/{user_id}/{story_id}'
     img_name = f'img_{page}.png'
     img_save_url = os.path.join(img_save_dir, img_name)
     
@@ -564,20 +565,9 @@ def gen_img():
     
     if string is not None and "ERROR" in str(string):
         return jsonify({'result': 'error', 'msg': string, 'data': ''})
-    
-    img_send_form = send_from_directory(img_save_dir, img_name)
-    
-    page_dict = {
-        'id': story_id,
-        'user_id': user_id,
-        'story_id': story_id,
-        'pagenum': page,
-        'context': context,
-        'image': img_send_form,
-    }
 
     print("이미지가 성공적으로 생성되었습니다.")
-    return jsonify({'result': 'success', 'msg': '이미지가 성공적으로 생성되었습니다!', 'data': page_dict})
+    return jsonify({'result': 'success', 'msg': '이미지가 성공적으로 생성되었습니다!', 'data': img_save_url})
 
 ### request img ###
 @app.route("/reqimg", methods=['POST'])
@@ -623,7 +613,7 @@ def req_img():
     
     gen_img_url = gen_img_update(topic, character, background, context, req_context)
     
-    img_save_dir = f'img/{user_id}/{story_id}'
+    img_save_dir = f'/home/ubuntu/public_html/img/{user_id}/{story_id}'
     img_name = f'img_{page}.png'
     img_save_url = os.path.join(img_save_dir, img_name)
     
@@ -640,20 +630,9 @@ def req_img():
     
     if string is not None and "ERROR" in str(string):
         return jsonify({'result': 'error', 'msg': string, 'data': ''})
-    
-    img_send_form = send_from_directory(img_save_dir, img_name)
-    
-    page_dict = {
-        'id': story_id,
-        'user_id': user_id,
-        'story_id': story_id,
-        'pagenum': page,
-        'context': context,
-        'image': img_send_form,
-    }
 
     print("요청이 반영된 이미지가 성공적으로 생성되었습니다.")
-    return jsonify({'result': 'success', 'msg': '요청이 반영된 이미지가 성공적으로 생성되었습니다!', 'data': page_dict})
+    return jsonify({'result': 'success', 'msg': '요청이 반영된 이미지가 성공적으로 생성되었습니다!', 'data': img_save_url})
 
 if __name__ == '__main__':
     ssl_key = (os.getenv('SSL_FULLCHAIN'), os.getenv('SSL_PRIVKEY'))
