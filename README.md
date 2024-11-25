@@ -11,6 +11,6 @@
 # 🧑🏻‍💻 ER Diagram
 <div align="center">
   
-<img width="709" alt="ERD" src="https://github.com/user-attachments/assets/cc259b3c-eee4-407f-b8f6-da59ed3364f0">
+<img width="700" alt="ERD" src="https://github.com/user-attachments/assets/c03bb8c8-32b0-4092-89dc-a24f8e422fb2">
 
 </div>
