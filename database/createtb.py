@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS story (
     `character` VARCHAR(255) NOT NULL,
     background VARCHAR(255) NOT NULL,
     `end` BOOLEAN NOT NULL DEFAULT FALSE,
+    cover VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
     UNIQUE (user_id, title)
 );
