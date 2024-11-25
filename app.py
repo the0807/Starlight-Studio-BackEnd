@@ -735,7 +735,7 @@ def generate_cover():
         
     # story 테이블에서 user_id, story_id에 해당하는 cover UPDATE
     string = execute_query(
-        "UPDATE story SET cover = %s WHERE user_id = %s AND story_id = %s",
+        "UPDATE story SET cover = %s WHERE user_id = %s AND id = %s",
         (img_save_url, user_id, story_id)
     )
     
