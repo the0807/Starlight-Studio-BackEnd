@@ -645,7 +645,7 @@ def share_story():
     
     # story_id story 테이블에서 title, user_id, `end` SELECT
     story_result = fetch_one(
-        "SELECT title, user_id, `end` FROM story WHERE id = %s", 
+        "SELECT title, user_id, `end`, cover FROM story WHERE id = %s", 
         (story_id,)
     )
     if not story_result:
@@ -656,6 +656,7 @@ def share_story():
         title = story_result[0]
         user_id = story_result[1]
         end = story_result[2]
+        cover = story_result[3]
         
         # user_id으로 user 테이블에서 username SELECT
         user_result = fetch_one("SELECT username FROM user WHERE id = %s", (user_id,))
@@ -687,7 +688,8 @@ def share_story():
                 'pagenum': page[3],
                 'context': page[4],
                 'image': page[5],
-                'end': end
+                'end': end,
+                'cover': cover
             }
             pages_list.append(page_dict)
 
