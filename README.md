@@ -2,7 +2,7 @@
 
 # 별빛 창작소
 
-### 📚 유치원생 대상 생성형 AI를 활용한 나만의 동화책 만들기 웹 서비스
+### 📚 유치원생을 위한 생성형 AI 기반의 창의적인 나만의 동화책 만들기 웹 서비스 
 
 <img width="256" alt="logo" src="https://github.com/user-attachments/assets/db515875-7b1d-4207-89da-edc62f530d76">
 
