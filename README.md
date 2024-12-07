@@ -4,7 +4,7 @@
 
 ### 📚 유치원생을 위한 생성형 AI 기반의 창의적인 나만의 동화책 만들기 웹 서비스 
 
-<img width="256" alt="logo" src="https://github.com/user-attachments/assets/db515875-7b1d-4207-89da-edc62f530d76">
+<img width="512" alt="logo" src="https://github.com/user-attachments/assets/ddbf89c0-fe5d-4ba4-8f3d-e67fa9bd6704">
 
 </div>
 
