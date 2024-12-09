@@ -33,7 +33,7 @@
 | <img width="1724" alt="9" src="https://github.com/user-attachments/assets/71bacc4b-d1f6-43c1-8085-c6dd98e70ab7"> | <img width="1724" alt="10" src="https://github.com/user-attachments/assets/918fb3a8-6e6a-4521-9d0a-c6c79bb0331a"> |
 
 > [!Note]
-> 웹 사이트는 `세종글꽃체`를 사용하여 작성되었습니다.
+> 별빛 창작소 웹 사이트는 `세종글꽃체`를 사용합니다.
 
 
 # 🧑🏻‍💻 ER Diagram
