@@ -27,11 +27,11 @@
 # 👀 이미지
 | <img width="1630" alt="1" src="https://github.com/user-attachments/assets/f0d3fc19-78a2-469d-8042-51b32a2674d8"> | <img width="1630" alt="2" src="https://github.com/user-attachments/assets/f90467f9-8175-4588-8a67-a027e3d27021"> |
 |:---:|:---:|
-| <img width="1630" alt="3" src="https://github.com/user-attachments/assets/bfb51229-0f20-45e9-b53d-ddf269c364af"> | <img width="1630" alt="4" src="https://github.com/user-attachments/assets/2c4e91db-5e93-4325-8cfe-868802d633d5"> |
-| <img width="1630" alt="5" src="https://github.com/user-attachments/assets/d4e60ec9-b26d-4c8b-8875-0cd98b8352cc"> | <img width="1630" alt="6" src="https://github.com/user-attachments/assets/e5737b09-e925-49d3-9db9-4b900d77258b"> |
-| <img width="1630" alt="7" src="https://github.com/user-attachments/assets/413468e6-029b-485a-b1e7-8412090c72b7"> | <img width="1630" alt="8" src="https://github.com/user-attachments/assets/d81ea3cb-5266-4223-ae19-6adad3e3fe4a"> |
-| <img width="1630" alt="9" src="https://github.com/user-attachments/assets/136d6b1e-c7b7-4dc3-81ac-1757cf582483"> | <img width="1630" alt="10" src="https://github.com/user-attachments/assets/7d9429da-8039-42f0-8c33-73ac22194c29"> |
-
+| <img width="1724" alt="1" src="https://github.com/user-attachments/assets/fe5203de-082e-4af8-a398-583cb240bd2a"> | <img width="1724" alt="2" src="https://github.com/user-attachments/assets/1a95e97d-401c-4a7b-9fa3-07ae75b38067"> |
+| <img width="1724" alt="3" src="https://github.com/user-attachments/assets/848ebbef-66b6-4cf7-a109-5595c0ba304b"> | <img width="1724" alt="4" src="https://github.com/user-attachments/assets/f7a24b06-0896-4ad8-87de-207a6a6b843c"> |
+| <img width="1724" alt="5" src="https://github.com/user-attachments/assets/4d2046a9-e2f1-4177-883d-4a3dc3f325da"> | <img width="1724" alt="6" src="https://github.com/user-attachments/assets/09ac5b7e-36fe-48bd-9fda-cadc54930188"> |
+| <img width="1724" alt="7" src="https://github.com/user-attachments/assets/ff946bce-5a3a-4e2a-bf13-13f131fbf294"> | <img width="1724" alt="8" src="https://github.com/user-attachments/assets/0b656684-9eeb-4688-8101-168767a41b71"> |
+| <img width="1724" alt="9" src="https://github.com/user-attachments/assets/71bacc4b-d1f6-43c1-8085-c6dd98e70ab7"> | <img width="1724" alt="10" src="https://github.com/user-attachments/assets/918fb3a8-6e6a-4521-9d0a-c6c79bb0331a"> |
 
 # 🧑🏻‍💻 ER Diagram
 <div align="center">
