@@ -8,6 +8,21 @@
 
 </div>
 
+# 😆 Contributors
+|   역할   |  이름  | GitHub 프로필                   |
+| :------: | :----: | :------------------------------ |
+| Front-End | 김도환 | https://github.com/ehghks021203 |
+| Back-End  | 엄태현 | https://github.com/the0807      |
+|  Gen-AI  | 정보경 | https://github.com/bkk21        |
+|  Gen-AI  | 송주훈 | https://github.com/zoo171       |
+
+# 📌 Related Links
+| 프로젝트 | Github 링크                                               |
+| :------: | :-------------------------------------------------------- |
+| Front-End | https://github.com/ehghks021203/Starlight-Studio-FrontEnd |
+| Back-End  | https://github.com/the0807/Starlight-Studio-BackEnd       |
+|  Gen-AI  | https://github.com/bkk21/Starlight-Studio                 |
+
 # 🛠️ Stacks
 <p align="center">
   <a href="https://skillicons.dev">
