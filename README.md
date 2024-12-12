@@ -40,6 +40,8 @@
 - 동화 공유하기
 
 # 👀 미리보기
+https://github.com/user-attachments/assets/3a6aad1f-4b4a-494e-9f90-4011a42c9f05
+
 | <img width="1724" alt="1" src="https://github.com/user-attachments/assets/fe5203de-082e-4af8-a398-583cb240bd2a">  | <img width="1724" alt="2" src="https://github.com/user-attachments/assets/1a95e97d-401c-4a7b-9fa3-07ae75b38067"> |
 |:---:|:---:|
 | <img width="1724" alt="3" src="https://github.com/user-attachments/assets/848ebbef-66b6-4cf7-a109-5595c0ba304b"> | <img width="1724" alt="4" src="https://github.com/user-attachments/assets/f7a24b06-0896-4ad8-87de-207a6a6b843c"> |
